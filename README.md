@@ -1,0 +1,12 @@
+# reposync
+Scripts for updating and maintaining a local mirror of RHEL/CentOS 7 and EPEL repositories with reposync
+
+This utility comes in two versions - one verbose, which does not suppress output, and one normal, which is suitable for installation as a cron job.
+
+It is recommended that you use a separate yum.conf file, and such a file and configuration directory (yum-reposync.conf and yum-reposync.conf.d/) is included for reference. If you are using the same platform whose repositories you want to mirror, it is a simple matter to copy yum.conf and yum.conf.d/, and use those as a basis. This allows you to mirror many repositories you might not want to enable on your system by default (you may not be interested in having source repositories enabled for day-to-day use, but you might want to make mirrors of them.) Having a separate configuration just for reposync allows you the flexibility of mirroring whatever you want, however you want (using different target directories conventions than the standard, for example: I personally strip all "-rpms" off the name of RHEL repositories, and place all repositories in /var/www/html/rpms.)
+
+You will need to import the public keys of all repositories you wish to mirror, and they will need to be installed in /etc/pki/rpm-gpg, to ensure that repositories can be checked. The default behaviour is to insist on checking, which means that any unverified packages are deleted after download.
+
+Once mirroring has finished, the packages will be processed to allow them to be used as a local installation source. So, if you ensure your package destination is somewhere that a netbooted and/or kickstarted RHEL/CentOS client can find it, you can install updates as part of the installation process (i.e. older versions will simply never be installed, and a newly-installed system will already contain the latest updates as available at the time of installation).
+
+Any errors with reposync will cause the script to stop - post-processing will not be performed in this event. If you encounter repository errors for a particular package, often it is a good idea to delete the offending package in your cache and allow it to be fetched again. You can also opt to run the script with the clean flag - and this will clear the yum cache, delete everything in the repository cache, and do over from the beginning. (If you are caching many repositories, it can take a couple of days to perform a full sync.)
